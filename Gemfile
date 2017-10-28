@@ -11,6 +11,8 @@ gem 'puma', '~> 3.0'
 
 gem 'rack-cors'
 gem 'rack-attack'
+gem 'omniauth'
+gem 'devise_token_auth'
 
 
 group :development, :test do
