@@ -13,6 +13,7 @@ gem 'rack-cors'
 gem 'rack-attack'
 gem 'omniauth'
 gem 'devise_token_auth'
+gem 'friendly_id', '~> 5.1.0'
 
 
 group :development, :test do
