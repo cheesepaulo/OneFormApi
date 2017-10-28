@@ -10,6 +10,7 @@ gem 'pg', '~> 0.18'
 gem 'puma', '~> 3.0'
 
 gem 'rack-cors'
+gem 'rack-attack'
 
 
 group :development, :test do
