@@ -1,4 +1,4 @@
-class Api::V1::FormsController < ApplicationController
+class Api::V1::FormsController < Api::V1::BaseController
   def index
   end
 
