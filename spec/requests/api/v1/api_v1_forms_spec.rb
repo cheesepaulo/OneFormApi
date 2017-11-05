@@ -41,16 +41,23 @@ RSpec.describe "Api::V1::Forms", type: :request do
       context "And is enable" do
         before do
           @form = create(:form, user: @user, enable: true)
+          @question1 = create(:question, form: @form)
+          @question2 = create(:question, form: @form)
+
+          get "/api/v1/forms/#{@form.friendly_id}", params: {}, headers: header_with_authentication(@user)
         end
 
         it "returns 200" do
-          get "/api/v1/forms/#{@form.friendly_id}", params: {}, headers: header_with_authentication(@user)
           expect_status(200)
         end
 
         it "returned Form with right datas" do
-          get "/api/v1/forms/#{@form.friendly_id}", params: {}, headers: header_with_authentication(@user)
-          expect(json).to eql(JSON.parse(@form.to_json))
+          expect(json.except('questions')).to eql(JSON.parse(@form.to_json))
+        end
+
+        it "returned associated questions" do
+          expect(json['questions'][0]).to eql(JSON.parse(@question1.to_json))
+          expect(json['questions'][1]).to  eql(JSON.parse(@question2.to_json))
         end
       end
 
@@ -60,7 +67,7 @@ RSpec.describe "Api::V1::Forms", type: :request do
         end
 
         it "returns 404" do
-          get "/api/v1/forms/#{@form.friendly_id}", params: {id: @form.friendly_id}, headers: header_with_authentication(@user)
+          get "/api/v1/forms/#{FFaker::Lorem.word}", params: {id: @form.friendly_id}, headers: header_with_authentication(@user)
           expect_status(404)
         end
       end
