@@ -196,53 +196,92 @@ RSpec.describe "Api::V1::Forms", type: :request do
 
 
   describe "DELETE /forms/:friendly_id" do
-    
+    before do
+      @user = create(:user)
+    end
+
     context "With Invalid authentication headers" do
       it_behaves_like :deny_without_authorization, :delete, "/api/v1/forms/questionary"
     end
 
-    context "When form exists" do
 
-      before do
-        @user = create(:user)
+    context "With valid authentication headers" do
+
+      context "When form exists" do
+
+        context "And user is the owner" do
+          before do
+            @form = create(:form, user: @user)
+            @question = create(:question, form: @form)
+            delete "/api/v1/forms/#{@form.friendly_id}", params: {}, headers: header_with_authentication(@user)
+          end
+
+          it "returns 200" do
+            expect_status(200)
+          end
+
+          it "form are deleted" do
+            expect(Form.all.count).to eql(0)
+          end
+
+          it "associated question are deleted" do
+            expect(Question.all.count).to eql(0)
+          end
+        end
+
+        context "And user is not the owner" do
+          before do
+            @form = create(:form)
+            delete "/api/v1/forms/#{@form.friendly_id}", params: {}, headers: header_with_authentication(@user)
+          end
+
+          it "returns 403" do
+            expect_status(403)
+          end
+        end
       end
 
-      context "And user is the owner" do
-        before do
-          @form = create(:form, user: @user)
-          delete "/api/v1/forms/#{@form.friendly_id}", params: {}, headers: header_with_authentication(@user)
-        end
-
-        it "returns 200" do
-          expect_status(200)
-        end
-
-        it "form are deleted" do
-          expect(Form.all.count).to eql(0)
+      context "When form dont exists" do
+        it "returns 404" do
+          delete "/api/v1/forms/#{FFaker::Lorem.word}", params: {}, headers: header_with_authentication(@user)
+          expect_status(404)
         end
       end
 
-      context "And user is not the owner" do
-        before do
-          @form = create(:form)
-          delete "/api/v1/forms/#{@form.friendly_id}", params: {}, headers: header_with_authentication(@user)
+      context "When form exists" do
+
+        context "And user is the owner" do
+          before do
+            @form = create(:form, user: @user)
+            delete "/api/v1/forms/#{@form.friendly_id}", params: {}, headers: header_with_authentication(@user)
+          end
+
+          it "returns 200" do
+            expect_status(200)
+          end
+
+          it "form are deleted" do
+            expect(Form.all.count).to eql(0)
+          end
         end
 
-        it "returns 403" do
-          expect_status(403)
+        context "And user is not the owner" do
+          before do
+            @form = create(:form)
+            delete "/api/v1/forms/#{@form.friendly_id}", params: {}, headers: header_with_authentication(@user)
+          end
+
+          it "returns 403" do
+            expect_status(403)
+          end
         end
       end
-    end
 
-    context "When form dont exists" do
-
-      before do
-        @user = create(:user)
-      end
-      
-      it "returns 404" do
-        delete "/api/v1/forms/#{FFaker::Lorem.word}", params: {}, headers: header_with_authentication(@user)
-        expect_status(404)
+      context "When form dont exists" do
+        it "returns 404" do
+          delete "/api/v1/forms/#{FFaker::Lorem.word}", params: {}, headers: header_with_authentication(@user)
+          expect_status(404)
+        end
       end
     end
   end
