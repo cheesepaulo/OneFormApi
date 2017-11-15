@@ -9,13 +9,6 @@ require 'rspec/rails'
 
 Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
 
-config.include Devise::Test::ControllerHelpers, type: :controller
-
-# Custom json helpers
-config.include Requests::JsonHelpers, type: :request
-# Custom Header helpers
-config.include Requests::HeaderHelpers, type: :request
-
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
 # run as spec files by default. This means that files in spec/support that end
@@ -43,6 +36,15 @@ RSpec.configure do |config|
   # examples within a transaction, remove the following line or assign false
   # instead of true.
   config.use_transactional_fixtures = true
+  
+  # Devise Helpers
+  config.include Devise::Test::ControllerHelpers, type: :controller
+
+  # Custom json helpers
+  config.include Requests::JsonHelpers, type: :request
+  
+  # Custom Header helpers
+  config.include Requests::HeaderHelpers, type: :request
 
   # RSpec Rails can automatically mix in different behaviours to your tests
   # based on their file location, for example enabling you to call `get` and
